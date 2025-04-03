@@ -204,9 +204,9 @@ func checkSites(state stateStruct) stateStruct {
 			if err != nil {
 				state.getState()
 				errorNum += 1
-				logOutput("CHECK_ERROR", requestURL)
-				fmt.Printf("error making http request: %s\n", err)
-				fmt.Printf("DEBUG: errorNum: %d errorNumALert: %d\n", state.ErrorNum, errorNumAlert)
+				errStr := err.Error()
+				logOutput("CHECK_ERROR:", requestURL+" error: "+errStr)
+				fmt.Printf("ERROR: errorNum: %d errorNumAlert: %d err: %s\n", state.ErrorNum, errorNumAlert, err)
 				if state.ErrorNum >= errorNumAlert {
 					postMessage("ALERT: error with site over 2 errors: " + requestURL + ": " + strconv.Itoa(state.ErrorNum) + " Date: " + tf)
 				}
@@ -215,8 +215,8 @@ func checkSites(state stateStruct) stateStruct {
 				logOutput("INFO: CHECK_OK", requestURL)
 				fmt.Println("INFO: CHECK_OK", requestURL)
 				fmt.Printf("INFO: client: status code: %d\n", res.StatusCode)
+				defer res.Body.Close()
 			}
-			defer res.Body.Close()
 
 			fmt.Print("INFO: errorNum ")
 			fmt.Println(errorNum)
