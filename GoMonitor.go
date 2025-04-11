@@ -24,6 +24,12 @@ import (
 // Verbose:
 var verbose = false
 
+// Single:
+var single = false
+
+// Threshold:
+var threshold = 300
+
 // Minutes to sleep between runs
 const sleepInterval time.Duration = 1
 
@@ -166,13 +172,27 @@ func checkFatal(msg string, err error) {
 func runMonitor() {
 	loop := 0
 	var state stateStruct
-	for {
-		loop++
+
+	if single {
+		fmt.Println("DEBUG: single on")
+	}
+
+	if single {
+		fmt.Println("INFO: SINGLE RUN")
+		logOutput("INFO:", "CHECK: GoMonitor SINGLE")
+		checkSites(state)
+		fmt.Println("INFO: exit")
+		os.Exit(0)
+	} else {
+		fmt.Println("INFO: LOOP RUN")
 		fmt.Println("INFO: Runtime:", loop, "minutes")
 		logOutput("INFO:", "CHECK: GoMonitor Loop")
-		state = checkSites(state)
-		fmt.Println("INFO: Checking again in:", time.Minute*sleepInterval)
-		time.Sleep(time.Minute * sleepInterval)
+		for {
+			loop++
+			state = checkSites(state)
+			fmt.Println("INFO: Checking again in:", time.Minute*sleepInterval)
+			time.Sleep(time.Minute * sleepInterval)
+		}
 	}
 }
 
@@ -229,6 +249,12 @@ func checkSites(state stateStruct) stateStruct {
 			end := time.Now().UnixNano() / int64(time.Millisecond)
 			diff := end - start
 			fmt.Println("DEBUG: Duration(ms):", diff)
+			fmt.Println("DEBUG: Threshold:", threshold)
+			diff_int := int(diff)
+			if diff_int > threshold {
+				fmt.Println("DEBUG: OVER Threshold Duration(ms):", diff)
+				postMessage("ALERT: error site over threshold: " + requestURL + ": Duration(ms): " + strconv.Itoa(diff_int) + " Date: " + tf)
+			}
 			newStr := strings.Replace(requestURL, ":", "_", -1)
 			newStr1 := strings.Replace(newStr, "/", "_", -1)
 			newStr2 := strings.Replace(newStr1, ".", "_", -1)
@@ -314,6 +340,8 @@ func connected() (ok bool) {
 
 func main() {
 	verboseFlag := flag.Bool("v", false, "Verbose checks")
+	singleFlag := flag.Bool("s", single, "Single checks")
+	thresholdFlag := flag.Int("t", threshold, "Threshold checks")
 	webserverFlag := flag.Bool("w", false, "Run webserver")
 
 	flag.Parse()
@@ -330,10 +358,14 @@ func main() {
 	fmt.Println("INFO: config:", config)
 
 	verbose = *verboseFlag
+	single = *singleFlag
+	threshold = *thresholdFlag
 	webserver = *webserverFlag
 
 	if verbose {
 		fmt.Println("INFO: Verbose:", verbose)
+		fmt.Println("INFO: Single:", single)
+		fmt.Println("INFO: Threshold:", threshold)
 		fmt.Println("INFO: Webserver:", webserver)
 	}
 
