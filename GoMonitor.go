@@ -28,7 +28,7 @@ var verbose = false
 var single = false
 
 // Threshold:
-var threshold = 300
+var threshold = 500
 
 // Minutes to sleep between runs
 const sleepInterval time.Duration = 1
@@ -247,13 +247,13 @@ func checkSites(state stateStruct) stateStruct {
 			t_end := time.Now()
 			tf_end := t_end.Format("2006.01.02-15.04.05:000")
 			end := time.Now().UnixNano() / int64(time.Millisecond)
-			diff := end - start
-			fmt.Println("DEBUG: Duration(ms):", diff)
+			duration := end - start
+			fmt.Println("DEBUG: Duration(ms):", duration)
 			fmt.Println("DEBUG: Threshold:", threshold)
-			diff_int := int(diff)
-			if diff_int > threshold {
-				fmt.Println("DEBUG: OVER Threshold Duration(ms):", diff)
-				postMessage("ALERT: error site over threshold: " + requestURL + ": Duration(ms): " + strconv.Itoa(diff_int) + " Date: " + tf)
+			durationDiffInt := int(duration)
+			if durationDiffInt > threshold {
+				fmt.Println("DEBUG: OVER Threshold Duration(ms):", duration)
+				postMessage("ALERT: error site over threshold: " + requestURL + ": Duration(ms): " + strconv.Itoa(durationDiffInt) + " Date: " + tf)
 			}
 			newStr := strings.Replace(requestURL, ":", "_", -1)
 			newStr1 := strings.Replace(newStr, "/", "_", -1)
@@ -261,7 +261,7 @@ func checkSites(state stateStruct) stateStruct {
 			var log_str = ""
 
 			fmt.Println("DEBUG: n", n)
-			log_str = newStr2 + " " + strconv.Itoa(int(diff))
+			log_str = newStr2 + " " + strconv.Itoa(int(duration))
 			if n == 0 {
 				logMerics("")
 				logMericsAppend(log_str)
