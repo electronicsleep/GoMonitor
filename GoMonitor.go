@@ -314,13 +314,14 @@ func postSlack(message string) {
 		request.Header.Set("Content-Type", "application/json; charset=UTF-8")
 		fmt.Println("INFO: Request:", request)
 		if error != nil {
-			fmt.Println("ERROR", error)
+			fmt.Println("ERROR: postSlack: http.NewRequest:", error)
 		}
 
 		client := &http.Client{}
 		response, error := client.Do(request)
 		if error != nil {
-			fmt.Println("ERROR", error)
+			fmt.Println("ERROR: postSlack: client.Do", error)
+			return
 		}
 		defer response.Body.Close()
 
@@ -335,6 +336,7 @@ func postSlack(message string) {
 
 func connected() (ok bool) {
 	_, err := http.Get("http://clients3.google.com/generate_204")
+	fmt.Println("ERROR: connected: err", err)
 	return err == nil
 }
 
