@@ -2,4 +2,4 @@ build:
 	./build.sh
 
 test: build
-	./GoMonitor -w
+	./GoMonitor -w -v -s
