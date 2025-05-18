@@ -174,10 +174,6 @@ func runMonitor() {
 	var state stateStruct
 
 	if single {
-		fmt.Println("DEBUG: single on")
-	}
-
-	if single {
 		fmt.Println("INFO: SINGLE RUN")
 		logOutput("INFO:", "CHECK: GoMonitor SINGLE")
 		checkSites(state)
@@ -209,6 +205,8 @@ func checkSites(state stateStruct) stateStruct {
 	fmt.Println(state.RunNum)
 
 	errorNum := 0
+	thresholdReachedNum := 0
+
 	checkNum := 3
 	errorNumAlert := 2
 	fmt.Println("INFO: checkNum: " + strconv.Itoa(checkNum))
@@ -252,8 +250,11 @@ func checkSites(state stateStruct) stateStruct {
 			fmt.Println("DEBUG: Threshold:", threshold)
 			durationDiffInt := int(duration)
 			if durationDiffInt > threshold {
-				fmt.Println("DEBUG: OVER Threshold Duration(ms):", duration)
-				postMessage("ALERT: error site over threshold: " + requestURL + ": Duration(ms): " + strconv.Itoa(durationDiffInt) + " Date: " + tf)
+				thresholdReachedNum += 1
+				fmt.Println("DEBUG: OVER Threshold Duration(ms):", duration, "thresholdReachedNum ", thresholdReachedNum)
+				if thresholdReachedNum > 1 {
+					postMessage("ALERT: error site over threshold: " + requestURL + ": Duration(ms): " + strconv.Itoa(durationDiffInt) + " Date: " + tf)
+				}
 			}
 			newStr := strings.Replace(requestURL, ":", "_", -1)
 			newStr1 := strings.Replace(newStr, "/", "_", -1)
