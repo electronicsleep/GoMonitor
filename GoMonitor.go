@@ -246,12 +246,12 @@ func checkSites(state stateStruct) stateStruct {
 			tf_end := t_end.Format("2006.01.02-15.04.05:000")
 			end := time.Now().UnixNano() / int64(time.Millisecond)
 			duration := end - start
-			fmt.Println("DEBUG: Duration(ms):", duration)
-			fmt.Println("DEBUG: Threshold:", threshold)
+			fmt.Println("INFO: Duration(ms):", duration)
+			fmt.Println("INFO: Threshold:", threshold)
 			durationDiffInt := int(duration)
 			if durationDiffInt > threshold {
 				thresholdReachedNum += 1
-				fmt.Println("DEBUG: OVER Threshold Duration(ms):", duration, "thresholdReachedNum ", thresholdReachedNum)
+				fmt.Println("INFO: OVER Threshold Duration(ms):", duration, "thresholdReachedNum ", thresholdReachedNum)
 				if thresholdReachedNum > 1 {
 					postMessage("ALERT: error site over threshold: " + requestURL + ": Duration(ms): " + strconv.Itoa(durationDiffInt) + " Date: " + tf)
 				}
@@ -261,7 +261,6 @@ func checkSites(state stateStruct) stateStruct {
 			newStr2 := strings.Replace(newStr1, ".", "_", -1)
 			var log_str = ""
 
-			fmt.Println("DEBUG: n", n)
 			log_str = newStr2 + " " + strconv.Itoa(int(duration))
 			if n == 0 {
 				logMerics("")
